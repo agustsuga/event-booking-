@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Booking Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .fees-section {
+      display: none;
+    }
+
+    /* Pop-up styling */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      text-align: center;
+    }
+
+    .popup.show {
+      display: block;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    .overlay.show {
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      form {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <form id="event-form" method="POST" action="">
+    <h1>Event Booking Form</h1>
+
+    <label for="first-name">First Name:</label>
+    <input type="text" id="first-name" name="first-name" aria-label="First Name" required>
+
+    <label for="email">Email Address:</label>
+    <input type="email" id="email" name="email" aria-label="Email Address" required>
+
+    <label for="event-type">Type of Event:</label>
+    <select id="event-type" name="event-type" onchange="updateFees()" aria-label="Type of Event" required>
+      <option value="">Select an Event Type</option>
+      <option value="performance">Performance</option>
+      <option value="endorsement">Endorsement</option>
+      <option value="meet-and-greet">Meet-and-Greet</option>
+    </select>
+
+    <div id="fees-section" class="fees-section">
+      <label for="fees">Fees:</label>
+      <select id="fees" name="fees" aria-label="Fees" required>
+        <!-- Options dynamically added here -->
+      </select>
+    </div>
+
+    <label for="payment-method">Payment Method:</label>
+    <select id="payment-method" name="payment-method" aria-label="Payment Method" required>
+      <option value="paypal">PayPal</option>
+      <option value="cashapp">Cash App</option>
+      <option value="zelle">Zelle</option>
+    </select>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="popup" id="popup">
+    <p>Your request is under review. You will receive an email regarding the next steps.</p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+
+  <script>
+    const feesData = {
+      performance: [
+        { value: "local", text: "Local Performances: $7,000" },
+        { value: "national", text: "National Performances (within the country): $30,000" },
+        { value: "international", text: "International Performances: $70,000" }
+      ],
+      endorsement: [
+        { value: "social-media", text: "Social Media Endorsements: $3,000 - $7,000 per post" },
+        { value: "brand-ambassador", text: "Brand Ambassadors: $15,000 - $30,000 per year" },
+        { value: "product-endorsement", text: "Product Endorsements: $8,000 - $15,000 per campaign" }
+      ],
+      "meet-and-greet": [
+        { value: "private", text: "Private Events: $3,000" },
+        { value: "public", text: "Public Events: $7,000" }
+      ]
+    };
+
+    function updateFees() {
+      const eventType = document.getElementById("event-type").value;
+      const feesSelect = document.getElementById("fees");
+      const feesSection = document.getElementById("fees-section");
+
+      feesSelect.innerHTML = ""; // Clear existing options
+      if (feesData[eventType]) {
+        feesSelect.innerHTML = "<option value=''>Select a Fee</option>";
+        feesData[eventType].forEach(option => {
+          const newOption = document.createElement("option");
+          newOption.value = option.value;
+          newOption.textContent = option.text;
+          feesSelect.appendChild(newOption);
+        });
+        feesSection.style.display = "block"; // Show fees dropdown
+      } else {
+        feesSection.style.display = "none"; // Hide fees dropdown
+      }
+    }
+
+    document.getElementById("event-form").addEventListener("submit", function (event) {
+      const feesSelect = document.getElementById("fees");
+      if (feesSelect.value === "") {
+        alert("Please select a fee.");
+        event.preventDefault(); // Prevent form submission
+      }
+    });
+
+    function showPopup() {
+      const popup = document.getElementById("popup");
+      const overlay = document.getElementById("overlay");
+      popup.classList.add("show");
+      overlay.classList.add("show");
+      popup.querySelector("button").focus();
+    }
+
+    function closePopup() {
+      document.getElementById("popup").classList.remove("show");
+      document.getElementById("overlay").classList.remove("show");
+    }
+  </script>
+
+  <?php
+  if ($_SERVER["REQUEST_METHOD"] == "POST") {
+      $firstName = strip_tags($_POST["first-name"]);
+      $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+      $eventType = strip_tags($_POST["event-type"]);
+      $fees = strip_tags($_POST["fees"]);
+      $paymentMethod = strip_tags($_POST["payment-method"]);
+
+      if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+          echo "<script>alert('Invalid email format. Please try again.');</script>";
+      } else {
+          $adminEmail = getenv("ADMIN_EMAIL") ?: "edwinlunamanagement@gmail.com";
+          $subjectAdmin = "New Event Booking";
+          $messageAdmin = "
+              New booking received:\n
+              First Name: $firstName\n
+              Email: $email\n
+              Event Type: $eventType\n
+              Selected Fee: $fees\n
+              Payment Method: $paymentMethod
+          ";
+          $headersAdmin = "From: $email";
+
+          if (mail($adminEmail, $subjectAdmin, $messageAdmin, $headersAdmin)) {
+              echo '<script>showPopup();</script>';
+          } else {
+              echo '<script>alert("Failed to send your booking. Please try again later.");</script>';
+          }
+      }
+  }
+  ?>
+</body>
+</html>
